@@ -11,15 +11,28 @@ import '../calendar_view/calendar_view.dart';
 part 'junky_logic.dart';
 part 'range_selector_logic.dart';
 
+typedef BottomBarBuilder = Widget Function(
+  RangeSelectorLogic logic,
+  BuildContext context,
+);
+
 class RangeSelector extends StatefulWidget {
   final double width;
   final double spacing;
   final double crossAxisPadding;
+  final Color dividerColor;
+  final TextStyle? headerTextStyle;
+  final CalendarColorScheme? colorScheme;
+  final BottomBarBuilder? bottomBar;
   const RangeSelector({
     super.key,
     this.width = 520,
     this.spacing = 24,
     this.crossAxisPadding = 12,
+    this.dividerColor = Colors.grey,
+    this.headerTextStyle,
+    this.colorScheme,
+    this.bottomBar,
   });
 
   @override
@@ -65,8 +78,8 @@ class _RangeSelectorState extends State<RangeSelector> {
               ),
             ],
           ),
-          const Divider(
-            color: Colors.grey,
+          Divider(
+            color: widget.dividerColor,
             height: 0,
           ),
           const SizedBox(height: 7),
@@ -79,32 +92,37 @@ class _RangeSelectorState extends State<RangeSelector> {
             ],
           ),
           const SizedBox(height: 7),
-          const Divider(
-            color: Colors.grey,
+          Divider(
+            color: widget.dividerColor,
             height: 0,
           ),
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-              width: 55,
-              child: MaterialButton(
-                color: Colors.blue,
-                onPressed: () {},
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                elevation: 0,
-                child: const Text(
-                  'OK',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          if (widget.bottomBar != null) widget.bottomBar!.call(logic, context),
+          // Container(
+          //   height: 44,
+          //   padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+          //   alignment: Alignment.centerRight,
+          //   child: SizedBox(
+          //     width: 55,
+          //     child: MaterialButton(
+          //       color: Colors.blue,
+          //       onPressed: () {
+          //         print(logic.startRange);
+          //         print(logic.endRange);
+          //       },
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(2),
+          //       ),
+          //       elevation: 0,
+          //       child: const Text(
+          //         'OK',
+          //         overflow: TextOverflow.ellipsis,
+          //         style: TextStyle(
+          //           color: Colors.white,
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -116,6 +134,7 @@ class _RangeSelectorState extends State<RangeSelector> {
     return CalendarView(
       controller: controller,
       width: calendarViewWidth,
+      colorScheme: widget.colorScheme,
       onHover: (calendarElemet, value) {
         logic.onHover(
           calendarElemet,
@@ -170,7 +189,11 @@ class _RangeSelectorState extends State<RangeSelector> {
           ValueListenableBuilder(
             valueListenable: notifier,
             builder: (context, val, _) {
-              return Text(val);
+              return Text(
+                val,
+                style: widget.headerTextStyle,
+                overflow: TextOverflow.ellipsis,
+              );
             },
           ),
           const Spacer(),

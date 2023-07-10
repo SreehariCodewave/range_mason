@@ -14,12 +14,14 @@ class CalendarView extends StatefulWidget {
   final CalendarViewController controller;
   final CalendarClick? onClick;
   final CalendarHover? onHover;
+  final CalendarColorScheme? colorScheme;
   const CalendarView({
     super.key,
     required this.controller,
     this.width = 280,
     this.onClick,
     this.onHover,
+    this.colorScheme,
   });
 
   @override
@@ -30,6 +32,8 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   void initState() {
     widget.controller._init(setState, widget.onClick, widget.onHover);
+    CalendarViewWidgets.setColorScheme(
+        widget.colorScheme ?? const CalendarColorScheme());
     super.initState();
   }
 
