@@ -25,6 +25,8 @@ class CalendarViewController {
 
   DateTime? get hoverEnd => _hoverEndRange;
 
+  DateTime? get individualSelectedDate => _singleDateSelectionDate;
+
   final String id;
 
   CalendarViewController({
