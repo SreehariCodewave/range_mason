@@ -57,7 +57,7 @@ class _DateSelectorState extends State<DateSelector> {
     // calendarViewWidth = widget.width / 2;
 
     maxWidth = widget.width + widget.crossAxisPadding;
-    calendarViewWidth = maxWidth - 10;
+    calendarViewWidth = maxWidth - 40;
 
     calendarNotifier = ValueNotifier<String>(_format(controller.displayDate!));
     super.initState();
