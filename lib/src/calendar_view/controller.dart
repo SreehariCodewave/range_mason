@@ -17,6 +17,10 @@ class CalendarViewController {
   DateTime? _rangeStartDate;
   DateTime? _rangeEndDate;
 
+  // for single date selection mode
+  DateTime? _selectableHover;
+  DateTime? _singleDateSelectionDate;
+
   DateTime? _hoverEndRange;
 
   DateTime? get hoverEnd => _hoverEndRange;
@@ -60,6 +64,16 @@ class CalendarViewController {
   void selectEndRange(DateTime? dateTime, {bool refresh = false}) {
     _rangeEndDate = dateTime;
     if (refresh) this.refresh(regenrateMonthArr: false);
+  }
+
+  void selectableHover(DateTime? dateTime) {
+    _selectableHover = dateTime;
+    refresh(regenrateMonthArr: false);
+  }
+
+  void selectSingleDate(DateTime? dateTime) {
+    _singleDateSelectionDate = dateTime;
+    refresh(regenrateMonthArr: false);
   }
 
   void setHoverEndRange(DateTime? dateTime) {
@@ -169,6 +183,17 @@ class CalendarViewController {
     DateTime dateTime = calendarElemet.dateTime;
     if (calendarElemet.isLeadingOrTrailing) {
       return CalendarViewWidgets.isLeadingOrTrailingElement(calendarElemet);
+    }
+
+    if (!_rangeSelectionMode && _isEqual(dateTime, _singleDateSelectionDate)) {
+      return CalendarViewWidgets.selectedDate(calendarElemet);
+    }
+
+    if (!_rangeSelectionMode && _isEqual(dateTime, _selectableHover)) {
+      return CalendarViewWidgets.selectedDate(
+        calendarElemet,
+        isSelectable: true,
+      );
     }
 
     if (_rangeSelectionMode &&
