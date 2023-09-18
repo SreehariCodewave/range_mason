@@ -12,7 +12,7 @@ import '../calendar_view/calendar_view.dart';
 // part 'range_selector_logic.dart';
 
 typedef BottomBarSelectorBuilder = Widget Function(
-  // RangeSelectorLogic logic,
+  CalendarViewController logic,
   BuildContext context,
 );
 
@@ -95,7 +95,8 @@ class _DateSelectorState extends State<DateSelector> {
             color: widget.dividerColor,
             height: 0,
           ),
-          if (widget.bottomBar != null) widget.bottomBar!.call(context),
+          if (widget.bottomBar != null)
+            widget.bottomBar!.call(controller, context),
         ],
       ),
     );
