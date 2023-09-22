@@ -14,6 +14,8 @@ import '../calendar_view/calendar_view.dart';
 typedef ControllerCreationCallBack = void Function(
     CalendarViewController controller);
 
+typedef OnCalendarUpdate = void Function(int month, int year);
+
 class DateSelector extends StatefulWidget {
   final double width;
   final EdgeInsets? padding;
@@ -22,8 +24,8 @@ class DateSelector extends StatefulWidget {
   final TextStyle? headerTextStyle;
   final CalendarColorScheme? colorScheme;
   final Widget? bottomBar;
-  // final ControllerCreationCallBack? onControllerCreated;
   final CalendarViewController controller;
+  final OnCalendarUpdate? onCalendarUpdate;
   const DateSelector({
     super.key,
     required this.controller,
@@ -34,7 +36,7 @@ class DateSelector extends StatefulWidget {
     this.headerTextStyle,
     this.colorScheme,
     this.bottomBar,
-    // this.onControllerCreated,
+    this.onCalendarUpdate,
   });
 
   @override
@@ -71,6 +73,8 @@ class _DateSelectorState extends State<DateSelector> {
 
   void _updateCalendarDateDisplay() {
     calendarNotifier.value = _format(widget.controller.displayDate!);
+    DateTime dateTime = widget.controller.displayDate!;
+    widget.onCalendarUpdate?.call(dateTime.month, dateTime.year);
   }
 
   @override
