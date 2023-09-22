@@ -11,10 +11,8 @@ import '../calendar_view/calendar_view.dart';
 // part 'junky_logic.dart';
 // part 'range_selector_logic.dart';
 
-typedef BottomBarSelectorBuilder = Widget Function(
-  CalendarViewController logic,
-  BuildContext context,
-);
+typedef ControllerCreationCallBack = void Function(
+    CalendarViewController controller);
 
 class DateSelector extends StatefulWidget {
   final double width;
@@ -23,9 +21,12 @@ class DateSelector extends StatefulWidget {
   final Color dividerColor;
   final TextStyle? headerTextStyle;
   final CalendarColorScheme? colorScheme;
-  final BottomBarSelectorBuilder? bottomBar;
+  final Widget? bottomBar;
+  // final ControllerCreationCallBack? onControllerCreated;
+  final CalendarViewController controller;
   const DateSelector({
     super.key,
+    required this.controller,
     this.width = 250,
     this.padding,
     this.crossAxisPadding = 12,
@@ -33,6 +34,7 @@ class DateSelector extends StatefulWidget {
     this.headerTextStyle,
     this.colorScheme,
     this.bottomBar,
+    // this.onControllerCreated,
   });
 
   @override
@@ -44,10 +46,10 @@ class _DateSelectorState extends State<DateSelector> {
   late double calendarViewWidth;
 
   // final RangeSelectorLogic logic = RangeSelectorLogic();
-  final CalendarViewController controller = CalendarViewController(
-    id: "data_selector",
-    enableRangeSelectionMode: false,
-  );
+  // final CalendarViewController controller = CalendarViewController(
+  //   id: "data_selector",
+  //   enableRangeSelectionMode: false,
+  // );
 
   late ValueNotifier<String> calendarNotifier;
 
@@ -59,19 +61,23 @@ class _DateSelectorState extends State<DateSelector> {
     maxWidth = widget.width + widget.crossAxisPadding;
     calendarViewWidth = maxWidth - 40;
 
-    calendarNotifier = ValueNotifier<String>(_format(controller.displayDate!));
+    calendarNotifier =
+        ValueNotifier<String>(_format(widget.controller.displayDate!));
+
+    // widget.onControllerCreated?.call(controller);
+
     super.initState();
   }
 
   void _updateCalendarDateDisplay() {
-    calendarNotifier.value = _format(controller.displayDate!);
+    calendarNotifier.value = _format(widget.controller.displayDate!);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(8),
         color: Colors.white,
       ),
       padding: widget.padding,
@@ -81,7 +87,7 @@ class _DateSelectorState extends State<DateSelector> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _calendarControls(
-            controller: controller,
+            controller: widget.controller,
             notifier: calendarNotifier,
           ),
           Divider(
@@ -89,14 +95,13 @@ class _DateSelectorState extends State<DateSelector> {
             height: 0,
           ),
           const SizedBox(height: 7),
-          _calendarView(controller),
+          _calendarView(widget.controller),
           const SizedBox(height: 7),
           Divider(
             color: widget.dividerColor,
             height: 0,
           ),
-          if (widget.bottomBar != null)
-            widget.bottomBar!.call(controller, context),
+          if (widget.bottomBar != null) widget.bottomBar!
         ],
       ),
     );

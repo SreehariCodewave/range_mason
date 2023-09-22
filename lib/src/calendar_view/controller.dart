@@ -1,6 +1,7 @@
 part of calendar_view;
 
 class CalendarViewController {
+  // 2D month array data
   late List<List<CalendarElemet?>> _monthArr;
 
   late DateTime _displayMonth;
@@ -124,6 +125,7 @@ class CalendarViewController {
     _calendarViewStateUpdator?.call(() {});
   }
 
+  // here we generate the 2D array which contains month elements
   void _generateMonthArr() {
     DateTime firstDayOfTheMonth =
         DateTime(_displayMonth.year, _displayMonth.month, 1);
@@ -151,6 +153,10 @@ class CalendarViewController {
     }
   }
 
+  // builds individual month elements goes from index 0 to 42
+  // when idx < 7 := we need to build the day
+  // and for the rest fill the elements of 2D array with monday day
+  // and the leading and trailing is filled as well
   Widget _buildMonthElemet(int index) {
     if (index < 7) {
       return SizedBox(
@@ -187,6 +193,12 @@ class CalendarViewController {
       return CalendarViewWidgets.isLeadingOrTrailingElement(calendarElemet);
     }
 
+    // render event
+    if (_eventExistsForDay(dateTime)) {
+      RangeMasonCalendarEvent event = _getEvent(dateTime);
+      return CalendarViewWidgets.event(event);
+    }
+
     if (!_rangeSelectionMode && _isEqual(dateTime, _singleDateSelectionDate)) {
       return CalendarViewWidgets.selectedDate(calendarElemet);
     }
@@ -198,6 +210,7 @@ class CalendarViewController {
       );
     }
 
+    // range selection mode check
     if (_rangeSelectionMode &&
         (_isEqual(dateTime, _rangeStartDate) ||
             _isEqual(dateTime, _rangeEndDate))) {
@@ -268,6 +281,33 @@ class CalendarViewController {
       return 0;
     } else {
       return 1;
+    }
+  }
+
+  // calendar event functionality
+
+  // event map
+  final Map<String, RangeMasonCalendarEvent> _eventMap = {};
+
+  bool _eventExistsForDay(DateTime dateTime) {
+    return _eventMap.containsKey(_generateEventMapKey(dateTime));
+  }
+
+  RangeMasonCalendarEvent _getEvent(DateTime dateTime) {
+    return _eventMap[_generateEventMapKey(dateTime)]!;
+  }
+
+  String _generateEventMapKey(DateTime dateTime) {
+    return DateFormat("dd MMM yyyy").format(dateTime);
+  }
+
+  void addEvent(RangeMasonCalendarEvent event) {
+    _eventMap[_generateEventMapKey(event.dateTime)] = event;
+  }
+
+  void addEvents(List<RangeMasonCalendarEvent> events) {
+    for (int idx = 0; idx < events.length; idx++) {
+      addEvent(events[idx]);
     }
   }
 }
