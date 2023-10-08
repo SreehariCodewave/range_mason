@@ -24,6 +24,7 @@ class DateSelector extends StatefulWidget {
   final Widget? bottomBar;
   final CalendarViewController controller;
   final OnCalendarUpdate? onCalendarUpdate;
+
   // final NarrowDownBottomBuilder? narrowDownBottomBuilder;
   const DateSelector({
     super.key,

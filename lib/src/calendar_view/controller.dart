@@ -28,12 +28,17 @@ class CalendarViewController {
 
   DateTime? get individualSelectedDate => _singleDateSelectionDate;
 
+  DateTime? _startDate;
+  DateTime? _endDate;
+
   final String id;
 
   CalendarViewController({
     bool enableRangeSelectionMode = false,
     int initialFocusDifferenceMonths = 0,
     int initialFocusDifferenceYears = 0,
+    DateTime? startDate,
+    DateTime? endDate,
     required this.id,
   }) {
     _rangeSelectionMode = enableRangeSelectionMode;
@@ -42,6 +47,8 @@ class CalendarViewController {
       now.year + initialFocusDifferenceYears,
       now.month + initialFocusDifferenceMonths,
     );
+    _startDate = startDate;
+    _endDate = endDate;
     _generateMonthArr();
   }
 
@@ -151,7 +158,8 @@ class CalendarViewController {
         }
         _monthArr[i][j] = CalendarElemet(
           dateTime: tmpDate,
-          isLeadingOrTrailing: tmpDate.month > firstDayOfTheMonth.month,
+          isLeadingOrTrailing: (tmpDate.month > firstDayOfTheMonth.month) ||
+              _isInvalidSelection(tmpDate),
           isToday: _isEqual(tmpDate, DateTime.now()),
         );
 
@@ -266,6 +274,12 @@ class CalendarViewController {
 
   ({int i, int j}) _extractIndices(int index) {
     return (i: index ~/ 7, j: index % 7);
+  }
+
+  bool _isInvalidSelection(DateTime X) {
+    if (_startDate != null && X.isBefore(_startDate!)) return true;
+    if (_endDate != null && X.isAfter(_endDate!)) return true;
+    return false;
   }
 
   bool _isEqual(DateTime? a, DateTime? b) {
