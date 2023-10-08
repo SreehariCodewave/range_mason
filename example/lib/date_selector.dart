@@ -9,8 +9,9 @@ class DateSelectorView extends StatefulWidget {
 }
 
 class _DateSelectorState extends State<DateSelectorView> {
-  final CalendarViewController calendarViewController =
-      CalendarViewController(id: 'calendar');
+  final CalendarViewController calendarViewController = CalendarViewController(
+      id: 'calendar',
+      startDate: DateTime.now().subtract(const Duration(days: 3)));
   @override
   Widget build(BuildContext context) {
     return Scaffold(
