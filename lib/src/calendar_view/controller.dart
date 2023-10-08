@@ -120,6 +120,13 @@ class CalendarViewController {
     refresh();
   }
 
+  void narrowDownViewSelect({required int month, required int year}) {
+    _displayMonth = DateTime(year, month);
+    _generateMonthArr();
+  }
+
+  void narrowDownViewCancel() {}
+
   void refresh({bool regenrateMonthArr = true}) {
     if (regenrateMonthArr) _generateMonthArr();
     _calendarViewStateUpdator?.call(() {});

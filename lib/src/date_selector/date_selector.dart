@@ -3,13 +3,11 @@ library date_range_selector;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:range_mason/src/date_selector/narrow_down_view.dart';
 
 import 'dart:math' as math;
 
 import '../calendar_view/calendar_view.dart';
-
-// part 'junky_logic.dart';
-// part 'range_selector_logic.dart';
 
 typedef ControllerCreationCallBack = void Function(
     CalendarViewController controller);
@@ -26,9 +24,11 @@ class DateSelector extends StatefulWidget {
   final Widget? bottomBar;
   final CalendarViewController controller;
   final OnCalendarUpdate? onCalendarUpdate;
+  // final NarrowDownBottomBuilder? narrowDownBottomBuilder;
   const DateSelector({
     super.key,
     required this.controller,
+    // this.narrowDownBottomBuilder,
     this.width = 250,
     this.padding,
     this.crossAxisPadding = 12,
@@ -47,26 +47,30 @@ class _DateSelectorState extends State<DateSelector> {
   late double maxWidth;
   late double calendarViewWidth;
 
-  // final RangeSelectorLogic logic = RangeSelectorLogic();
-  // final CalendarViewController controller = CalendarViewController(
-  //   id: "data_selector",
-  //   enableRangeSelectionMode: false,
-  // );
-
   late ValueNotifier<String> calendarNotifier;
+
+  final GlobalKey calendarViewKey =
+      const GlobalObjectKey('range_mason_calendar_view');
+
+  double? calendarViewRenderedHeight;
+  double? calendarViewRenderedWidth;
+
+  bool _displayNarrowDownView = false;
 
   @override
   void initState() {
-    // maxWidth = widget.width + widget.spacing + (widget.crossAxisPadding * 2);
-    // calendarViewWidth = widget.width / 2;
-
     maxWidth = widget.width + widget.crossAxisPadding;
     calendarViewWidth = maxWidth - 40;
 
     calendarNotifier =
         ValueNotifier<String>(_format(widget.controller.displayDate!));
 
-    // widget.onControllerCreated?.call(controller);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      RenderBox renderbox =
+          calendarViewKey.currentContext!.findRenderObject() as RenderBox;
+      calendarViewRenderedWidth = renderbox.size.width;
+      calendarViewRenderedHeight = renderbox.size.height;
+    });
 
     super.initState();
   }
@@ -79,6 +83,34 @@ class _DateSelectorState extends State<DateSelector> {
 
   @override
   Widget build(BuildContext context) {
+    if (_displayNarrowDownView) {
+      return NarrowDownView(
+        width: calendarViewRenderedWidth!,
+        height: calendarViewRenderedHeight!,
+        colorScheme: widget.colorScheme ??
+            const CalendarColorScheme(
+              selectedColor: Color(0xff436AF5),
+            ),
+        displayDate: widget.controller.displayDate!,
+        maxWidth: maxWidth,
+        headerTextStyle: widget.headerTextStyle,
+        calendarViewController: widget.controller,
+        dividerColor: widget.dividerColor,
+        onSelect: (month, year) {
+          widget.controller.narrowDownViewSelect(month: month, year: year);
+          setState(() {
+            _displayNarrowDownView = false;
+          });
+          _updateCalendarDateDisplay();
+        },
+        onCancel: () {
+          setState(() {
+            _displayNarrowDownView = false;
+          });
+        },
+        // narrowDownBottomBuilder: widget.narrowDownBottomBuilder,
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -89,6 +121,7 @@ class _DateSelectorState extends State<DateSelector> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           _calendarControls(
             controller: widget.controller,
@@ -115,6 +148,7 @@ class _DateSelectorState extends State<DateSelector> {
     CalendarViewController controller,
   ) {
     return CalendarView(
+      key: calendarViewKey,
       controller: controller,
       width: calendarViewWidth,
       colorScheme: widget.colorScheme,
@@ -164,15 +198,22 @@ class _DateSelectorState extends State<DateSelector> {
             ),
           ),
           const Spacer(),
-          ValueListenableBuilder(
-            valueListenable: notifier,
-            builder: (context, val, _) {
-              return Text(
-                val,
-                style: widget.headerTextStyle,
-                overflow: TextOverflow.ellipsis,
-              );
+          InkWell(
+            onTap: () {
+              setState(() {
+                _displayNarrowDownView = true;
+              });
             },
+            child: ValueListenableBuilder(
+              valueListenable: notifier,
+              builder: (context, val, _) {
+                return Text(
+                  val,
+                  style: widget.headerTextStyle,
+                  overflow: TextOverflow.ellipsis,
+                );
+              },
+            ),
           ),
           const Spacer(),
           Transform.rotate(
