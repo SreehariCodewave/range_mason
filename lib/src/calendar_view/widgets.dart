@@ -188,4 +188,27 @@ class CalendarViewWidgets {
       )),
     );
   }
+
+  // for events
+  static Widget event(RangeMasonCalendarEvent event) {
+    return Container(
+      height: 24,
+      width: 24,
+      decoration: event.boxDecoration,
+      // BoxDecoration(
+      //   borderRadius: BorderRadius.circular(4),
+      //   color: isSelectable
+      //       ? _colorScheme.possibleSelectionColor
+      //       : _colorScheme.selectedColor,
+      // ),
+      margin: const EdgeInsets.all(4),
+      child: Center(
+          child: Text(
+        '${event.dateTime.day}',
+        style: event.textStyle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      )),
+    );
+  }
 }

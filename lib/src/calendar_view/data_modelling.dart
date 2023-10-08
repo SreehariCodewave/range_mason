@@ -29,3 +29,15 @@ typedef CalendarViewStateUpdator = void Function(void Function() fn);
 typedef CalendarClick = void Function(CalendarElemet calendarElemet);
 typedef CalendarHover = void Function(
     CalendarElemet calendarElemet, bool value);
+
+class RangeMasonCalendarEvent {
+  final DateTime dateTime;
+  final TextStyle textStyle;
+  final BoxDecoration boxDecoration;
+
+  RangeMasonCalendarEvent({
+    required this.dateTime,
+    required this.textStyle,
+    required this.boxDecoration,
+  });
+}
