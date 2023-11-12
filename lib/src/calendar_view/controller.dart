@@ -43,10 +43,14 @@ class CalendarViewController {
   }) {
     _rangeSelectionMode = enableRangeSelectionMode;
     DateTime now = DateTime.now();
-    _displayMonth = DateTime(
-      now.year + initialFocusDifferenceYears,
-      now.month + initialFocusDifferenceMonths,
-    );
+    if (endDate != null && endDate.isBefore(now)) {
+      _displayMonth = DateTime(endDate.year, endDate.month);
+    } else {
+      _displayMonth = DateTime(
+        now.year + initialFocusDifferenceYears,
+        now.month + initialFocusDifferenceMonths,
+      );
+    }
     _startDate = startDate;
     _endDate = endDate;
     _generateMonthArr();
